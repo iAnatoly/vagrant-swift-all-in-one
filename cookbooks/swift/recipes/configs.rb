@@ -88,7 +88,6 @@ template "/etc/swift/swift.conf" do
 end
 
 [
-  'test.conf',
   'dispersion.conf',
   'bench.conf',
   'container-sync-realms.conf',
@@ -104,6 +103,13 @@ template "/etc/swift/base.conf-template" do
   source "etc/swift/base.conf-template.erb"
   variables({
     :username => node['username'],
+  })
+end
+
+template '/etc/swift/test.conf' do
+  source "etc/swift/test.conf.erb"
+  variables({
+    :ssl => node['ssl'],
   })
 end
 

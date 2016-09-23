@@ -115,8 +115,14 @@ end
 
 # swift command line env setup
 
+if node['ssl'] then
+  auth_url = "https://#{node['hostname']}/auth/v1.0"
+else
+  auth_url = "http://#{node['hostname']}:8080/auth/v1.0"
+end
 {
-  "ST_AUTH" => "http://#{node['hostname']}:8080/auth/v1.0",
+  "ST_AUTH" => auth_url,
+  "SWIFTCLIENT_INSECURE" => "true",  # w/e it's *dev* ;)
   "ST_USER" => "test:tester",
   "ST_KEY" => "testing",
 }.each do |var, value|
