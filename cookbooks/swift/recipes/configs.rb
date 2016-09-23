@@ -40,6 +40,34 @@ end
   end
 end
 
+# haproxy
+
+execute "create cert" do
+  command "openssl req -x509 -nodes -days 365 -newkey rsa:2048 " \
+    "-keyout saio.key -out saio.crt -subj '/CN=saio'"
+  cwd "/etc/ssl/private/"
+end
+
+execute "create pem" do
+  command "cat saio.crt saio.key > saio.pem"
+  cwd "/etc/ssl/private/"
+end
+
+cookbook_file "/etc/haproxy/haproxy.cfg" do
+  source "etc/haproxy/haproxy.cfg"
+  notifies :restart, 'service[haproxy]'
+  owner node['username']
+  group node['username']
+end
+
+service "haproxy" do
+  if node['ssl'] then
+    action :start
+  else
+    action :stop
+  end
+end
+
 # swift
 
 directory "/etc/swift" do
@@ -116,11 +144,21 @@ end
     owner node["username"]
     group node["username"]
   end
-  cookbook_file "#{proxy_conf_dir}/20_settings.conf" do
-    source "#{proxy_conf_dir}/20_settings.conf"
-    owner node["username"]
-    group node["username"]
-  end
+end
+
+template "/etc/swift/proxy-server/proxy-server.conf.d/20_settings.conf" do
+  source "etc/swift/proxy-server/proxy-server.conf.d/20_settings.conf.erb"
+  owner node["username"]
+  group node["username"]
+  variables({
+    :ssl => node['ssl'],
+  })
+end
+
+cookbook_file "/etc/swift/proxy-server/proxy-noauth.conf.d/20_settings.conf" do
+  source "etc/swift/proxy-server/proxy-noauth.conf.d/20_settings.conf"
+  owner node["username"]
+  group node["username"]
 end
 
 ["object", "container", "account"].each_with_index do |service, p|

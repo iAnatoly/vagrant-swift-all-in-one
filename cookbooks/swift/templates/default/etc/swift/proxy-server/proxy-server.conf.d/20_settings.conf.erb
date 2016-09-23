@@ -1,6 +1,9 @@
 [DEFAULT]
 bind_port = 8080
 
+[app:proxy-server]
+require_proxy_protocol = <%= @ssl %>
+
 [pipeline:main]
 pipeline = catch_errors healthcheck proxy-logging cache container_sync bulk tempurl tempauth staticweb slo dlo versioned_writes keymaster encryption proxy-logging proxy-server
 

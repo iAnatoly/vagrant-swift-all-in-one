@@ -62,7 +62,7 @@ required_packages = [
   "libssl-dev", # libssl-dev is required for building wheels from the cryptography package in swift.
   "curl", "gcc", "memcached", "rsync", "sqlite3", "xfsprogs", "git-core", "build-essential",
   "python-dev", "libffi-dev", "python3.4", "python3.4-dev", "python2.6", "python2.6-dev",
-  "libxml2-dev", "libxml2", "libxslt1-dev",
+  "libxml2-dev", "libxml2", "libxslt1-dev",  "haproxy",
 ]
 extra_packages = node['extra_packages']
 (required_packages + extra_packages).each do |pkg|
