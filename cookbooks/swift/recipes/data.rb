@@ -61,13 +61,13 @@ end
   node_path = "/srv/node#{j}"
   srv_path = node_path + "/sdb#{i}"
   directory disk_path do
-    owner "vagrant"
-    group "vagrant"
+    owner node["username"]
+    group node["username"]
     action :create
   end
   directory node_path do
-    owner "vagrant"
-    group "vagrant"
+    owner node["username"]
+    group node["username"]
     action :create
   end
   link srv_path do
@@ -82,8 +82,8 @@ end
   "/var/cache/swift",
 ].each do |d|
   directory d do
-    owner "vagrant"
-    group "vagrant"
+    owner node["username"]
+    group node["username"]
     action :create
   end
 end
@@ -91,8 +91,8 @@ end
 (1..node['nodes']).each do |i|
   recon_cache_path = "/var/cache/swift/node#{i}"
   directory recon_cache_path do
-    owner "vagrant"
-    group "vagrant"
+    owner node["username"]
+    group node["username"]
     recursive true
   end
 end
@@ -100,6 +100,6 @@ end
 # make vagrant able to read /var/log/syslog
 group "adm" do
   action :modify
-  members "vagrant"
+  members node["username"]
   append true
 end

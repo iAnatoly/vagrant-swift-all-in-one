@@ -15,19 +15,15 @@
 
 
 execute "clean-up" do
-  command "rm /home/vagrant/postinstall.sh || true"
-end
-
-execute 'create vagrant user' do
-  command 'sudo adduser --disabled-password --gecos "" vagrant || true'
+  command "rm /home/#{node['username']}/postinstall.sh || true"
 end
 
 execute 'ensure ssh directory exists' do
-  command 'mkdir -p ~vagrant/.ssh'
+  command "mkdir -p ~#{node['username']}/.ssh"
 end
 
 if node['extra_key'] then
-  keys_file = "~vagrant/.ssh/authorized_keys"
+  keys_file = "~#{node['username']}/.ssh/authorized_keys"
   execute "add_extra_key" do
     command "echo '#{node['extra_key']}' >> #{keys_file}"
     not_if "grep -q '#{node['extra_key']}' #{keys_file}"
@@ -41,11 +37,11 @@ execute "deadsnakes key" do
   not_if "sudo apt-key list | grep 'Launchpad Old Python Versions'"
 end
 
-cookbook_file "/etc/apt/sources.list.d/fkrull-deadsnakes-trusty.list" do
-  source "etc/apt/sources.list.d/fkrull-deadsnakes-trusty.list"
-  mode 0644
+execute "add repo" do
+  command "sudo add-apt-repository ppa:fkrull/deadsnakes"
 end
 
+# backports seems to be enabeld on xenail aready?
 execute "enable backports" do
   command "sudo sed -ie 's/# deb http:\\/\\/archive.ubuntu.com\\/ubuntu trusty-backports/deb http:\\/\\/archive.ubuntu.com\\/ubuntu trusty-backports/' /etc/apt/sources.list"
   action :run
@@ -112,8 +108,8 @@ end
 # setup environment
 
 execute "update-path" do
-  command "echo 'export PATH=/vagrant/bin:$PATH' >> /home/vagrant/.profile"
-  not_if "grep /vagrant/bin /home/vagrant/.profile"
+  command "echo 'export PATH=/vagrant/bin:$PATH' >> /home/#{node['username']}/.profile"
+  not_if "grep /vagrant/bin /home/#{node['username']}/.profile"
   action :run
 end
 
@@ -125,8 +121,8 @@ end
   "ST_KEY" => "testing",
 }.each do |var, value|
   execute "swift-env-#{var}" do
-    command "echo 'export #{var}=#{value}' >> /home/vagrant/.profile"
-    not_if "grep #{var} /home/vagrant/.profile"
+    command "echo 'export #{var}=#{value}' >> /home/#{node['username']}/.profile"
+    not_if "grep #{var} /home/#{node['username']}/.profile"
     action :run
   end
 end
@@ -137,8 +133,8 @@ end
   "NOSE_INCLUDE_EXE" => "true",
 }.each do |var, value|
   execute "swift-env-#{var}" do
-    command "echo 'export #{var}=#{value}' >> /home/vagrant/.profile"
-    not_if "grep #{var} /home/vagrant/.profile"
+    command "echo 'export #{var}=#{value}' >> /home/#{node['username']}/.profile"
+    not_if "grep #{var} /home/#{node['username']}/.profile"
     action :run
   end
 end
