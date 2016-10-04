@@ -107,11 +107,14 @@ end
 
 # setup environment
 
+profile_file = "/home/#{node['username']}/.profile"
+
 execute "update-path" do
-  command "echo 'export PATH=/vagrant/bin:$PATH' >> /home/#{node['username']}/.profile"
-  not_if "grep /vagrant/bin /home/#{node['username']}/.profile"
+  command "echo 'export PATH=/vagrant/bin:$PATH' >> #{profile_file}"
+  not_if "grep /vagrant/bin #{profile_file}"
   action :run
 end
+
 
 # swift command line env setup
 
@@ -127,8 +130,9 @@ end
   "ST_KEY" => "testing",
 }.each do |var, value|
   execute "swift-env-#{var}" do
-    command "echo 'export #{var}=#{value}' >> /home/#{node['username']}/.profile"
-    not_if "grep #{var} /home/#{node['username']}/.profile"
+    command "echo 'export #{var}=#{value}' >> #{profile_file}"
+    not_if "grep #{var} #{profile_file} && " \
+      "sed '/#{var}/c\\export #{var}=#{value}' -i #{profile_file}"
     action :run
   end
 end
@@ -139,8 +143,9 @@ end
   "NOSE_INCLUDE_EXE" => "true",
 }.each do |var, value|
   execute "swift-env-#{var}" do
-    command "echo 'export #{var}=#{value}' >> /home/#{node['username']}/.profile"
-    not_if "grep #{var} /home/#{node['username']}/.profile"
+    command "echo 'export #{var}=#{value}' >> #{profile_file}"
+    not_if "grep #{var} #{profile_file} && " \
+      "sed '/#{var}/c\\export #{var}=#{value}' -i #{profile_file}"
     action :run
   end
 end
