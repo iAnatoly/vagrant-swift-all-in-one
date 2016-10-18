@@ -65,7 +65,8 @@ end
     group node["username"]
     action :create
   end
-  directory node_path do
+  directory "create node path for #{disk_path}" do
+    path node_path
     owner node["username"]
     group node["username"]
     action :create
