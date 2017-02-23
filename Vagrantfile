@@ -19,16 +19,16 @@
 
 require 'ipaddr'
 
-DEFAULT_BOX = "xenial"
+DEFAULT_BOX = "fgrehm/trusty64-lxc"
 
 vagrant_boxes = {
   "precise" => "https://hashicorp-files.hashicorp.com/precise64.box",
-  "trusty" => "https://atlas.hashicorp.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box",
+  "fgrehm/trusty64-lxc" => "https://atlas.hashicorp.com/fgrehm/boxes/trusty64-lxc/versions/1.2.0/providers/lxc.box",
   "xenial" => "http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-vagrant.box",
   "dummy" => "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box",
 }
 vagrant_box = (ENV['VAGRANT_BOX'] || DEFAULT_BOX)
-username = (ENV['VAGRANT_USERNAME'] || "ubuntu")
+username = (ENV['VAGRANT_USERNAME'] || "vagrant")
 
 base_ip = IPAddr.new(ENV['IP'] || "192.168.8.80")
 hosts = {
@@ -105,6 +105,11 @@ Vagrant.configure("2") do |global_config|
         if (ENV['GUI'] || '').nil?  # Why is my VM hung on boot? Find out!
           vb.gui = true
         end
+      end
+
+      config.vm.provider :lxc do |vb, override|
+        override.vm.hostname = hostname
+        override.vm.network :private_network, ip: ip, lxc__bridge_name: 'vlxcbr1'
       end
 
       config.vm.provider :aws do |v, override|
