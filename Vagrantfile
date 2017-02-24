@@ -128,6 +128,8 @@ Vagrant.configure("2") do |global_config|
       end
 
       config.vm.provision :chef_solo do |chef|
+	chef.channel = "stable"
+	chef.version = "12.10.24"
         chef.add_recipe "swift"
         chef.json = local_config
       end
